@@ -19,14 +19,14 @@ NSManagedObjectContext *managedObjectContext(NSString *sqlitePath, NSString *mom
 int main (int argc, const char * argv[])
 {
 
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  @autoreleasepool {
   // ------------------------------------------------------------
 
-  int ret = submain([[NSProcessInfo processInfo] arguments]);
-  
-  // ------------------------------------------------------------
-  [pool drain];
-  return ret;
+    int ret = submain([[NSProcessInfo processInfo] arguments]);
+    
+    // ------------------------------------------------------------
+    return ret;
+  }
 }
 
 
@@ -211,30 +211,30 @@ NSManagedObjectContext *managedObjectContext(NSString *sqlitePath,  NSString *mo
       return context;
   }
 
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];        
-  context = [[NSManagedObjectContext alloc] init];
-    
-  NSPersistentStoreCoordinator *coordinator = 
-  [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: managedObjectModel(momdPath)];
-  [context setPersistentStoreCoordinator: coordinator];
-    
-  NSString *STORE_TYPE = NSSQLiteStoreType;
-    
-  NSString *path = [[[NSProcessInfo processInfo] arguments] objectAtIndex:0];
-  path = [path stringByDeletingPathExtension];
-  NSURL *url = [NSURL fileURLWithPath:sqlitePath];//[path stringByAppendingPathExtension:@"sqlite"]];
-    
-  NSError *error;
-  NSPersistentStore *newStore = [coordinator 
-                                 addPersistentStoreWithType:STORE_TYPE 
-                                 configuration:nil URL:url options:nil error:&error];
-    
-  if (newStore == nil) {
-      NSLog(@"Store Configuration Failure %@",
-            ([error localizedDescription] != nil) ?
-            [error localizedDescription] : @"Unknown Error");
+  @autoreleasepool {        
+    context = [[NSManagedObjectContext alloc] init];
+      
+    NSPersistentStoreCoordinator *coordinator = 
+    [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: managedObjectModel(momdPath)];
+    [context setPersistentStoreCoordinator: coordinator];
+      
+    NSString *STORE_TYPE = NSSQLiteStoreType;
+      
+    NSString *path = [[[NSProcessInfo processInfo] arguments] objectAtIndex:0];
+    path = [path stringByDeletingPathExtension];
+    NSURL *url = [NSURL fileURLWithPath:sqlitePath];//[path stringByAppendingPathExtension:@"sqlite"]];
+      
+    NSError *error;
+    NSPersistentStore *newStore = [coordinator 
+                                   addPersistentStoreWithType:STORE_TYPE 
+                                   configuration:nil URL:url options:nil error:&error];
+      
+    if (newStore == nil) {
+        NSLog(@"Store Configuration Failure %@",
+              ([error localizedDescription] != nil) ?
+              [error localizedDescription] : @"Unknown Error");
+    }
+    return context;
   }
-  [pool drain];
-  return context;
 }
 
